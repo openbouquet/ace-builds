@@ -1058,11 +1058,17 @@ var AcePopup = function(parentNode) {
 
         var last = -1;
         var flag, c;
+	var first = true;
         for (var i = 0; i < data.caption.length; i++) {
             c = data.caption[i];
             flag = data.matchMask & (1 << i) ? 1 : 0;
-            if (last !== flag) {
-                tokens.push({type: data.className || "" + ( flag ? "completion-highlight" : ""), value: c});
+            if (last !== flag ) {
+                if(first){
+                    first = false;
+                    tokens.push({type: flag ? ( "" + (data.className || "" ) + " .completion-highlight") : ( "" + (data.className || "" )), value: c});
+                } else {
+                    tokens.push({type: ("" + ( flag ? "completion-highlight" : "")), value: c});
+                }
                 last = flag;
             } else {
                 tokens[tokens.length - 1].value += c;

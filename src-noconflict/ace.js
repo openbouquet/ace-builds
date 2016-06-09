@@ -2774,7 +2774,7 @@ function GutterHandler(mouseHandler) {
         tooltipAnnotation = annotation.text.join("<br/>");
 
         tooltip.setHtml(tooltipAnnotation);
-        tooltip.show();
+        tooltip.show(null, 0,mouseEvent.clientY);
         editor.on("mousewheel", hideTooltip);
 
         if (mouseHandler.$tooltipFollowsMouse) {
@@ -2799,7 +2799,7 @@ function GutterHandler(mouseHandler) {
     }
 
     function moveTooltip(e) {
-        tooltip.setPosition(e.x, e.y);
+        tooltip.setPosition(0, e.y);
     }
 
     mouseHandler.editor.setDefaultHandler("guttermousemove", function(e) {
