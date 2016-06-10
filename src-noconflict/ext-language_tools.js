@@ -973,7 +973,7 @@ var AcePopup = function(parentNode) {
     selectionMarker.id = popup.session.addMarker(selectionMarker, "ace_active-line", "fullLine");
     popup.setSelectOnHover = function(val) {
         if (!val) {
-            hoverMarker.id = popup.session.addMarker(hoverMarker, "ace_line-hover", "fullLine");
+            hoverMarker.id = popup.session.addMarker(hoverMarker, "popup-hover", "fullLine");
         } else if (hoverMarker.id) {
             popup.session.removeMarker(hoverMarker.id);
             hoverMarker.id = null;
@@ -1648,6 +1648,7 @@ Autocomplete.startCommand = {
             editor.completer = new Autocomplete();
         editor.completer.autoInsert = false;
         editor.completer.autoSelect = true;
+        editor.completer.
         editor.completer.showPopup(editor);
         editor.completer.cancelContextMenu();
     },
@@ -1890,6 +1891,8 @@ var doLiveAutocomplete = function(e) {
     }
     else if (e.command.name === "insertstring") {
         var prefix = util.getCompletionPrefix(editor);
+        editor.completer.detach();
+        editor.completer.showPopup(editor);
         if (prefix && !hasCompleter) {
             if (!editor.completer) {
                 editor.completer = new Autocomplete();
