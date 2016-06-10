@@ -1891,8 +1891,10 @@ var doLiveAutocomplete = function(e) {
     }
     else if (e.command.name === "insertstring") {
         var prefix = util.getCompletionPrefix(editor);
-        editor.completer.detach();
-        editor.completer.showPopup(editor);
+        if(editor.completer){
+            editor.completer.detach();
+            editor.completer.showPopup(editor);
+        }
         if (prefix && !hasCompleter) {
             if (!editor.completer) {
                 editor.completer = new Autocomplete();
