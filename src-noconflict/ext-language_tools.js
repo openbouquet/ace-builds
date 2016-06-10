@@ -1668,7 +1668,8 @@ var FilteredList = function(array, filterText) {
             var matches = this.all;
 
         this.filterText = str;
-        matches = this.filterCompletions(matches, this.filterText);
+        //lrabiet: don't want to filter the completions based on the prefix
+        //matches = this.filterCompletions(matches, this.filterText);
         matches = matches.sort(function(a, b) {
             return b.exactMatch - a.exactMatch || b.score - a.score;
         });
