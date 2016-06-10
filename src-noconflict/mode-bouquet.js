@@ -1053,7 +1053,7 @@ ace.define("ace/mode/bouquet",["require","exports","module","ace/lib/oop","ace/m
                     squid_api.getSelectedDomain().then(function (domain) {
                         worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id,domainId:domain.id, type:session.type}]);
                     });
-                }else if (session.type == "domains") {
+                }else if (session.type == "domains" || session.type == "relations" ) {
                     //Ignoring current domain
                     worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id, type:session.type}]);
                 } else{

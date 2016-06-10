@@ -11828,8 +11828,8 @@ ace.define("ace/mode/bouquet_worker",["require","exports","module", "ace/lib/oop
 
             var oReq = new XMLHttpRequest();
 
-            if(this.options.type == "domains"){
-                this.url = this.options.squid_apiUrl + "/projects/" + this.options.projectId + "/domains-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
+            if(this.options.type == "domains" || this.options.type == "relations" ){
+                this.url = this.options.squid_apiUrl + "/projects/" + this.options.projectId + "/"+this.options.type+"-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
             } else if(this.options.domainId && this.options.type){
                 this.url = this.options.squid_apiUrl + "/projects/" + this.options.projectId + "/domains/" + this.options.domainId + "/" + this.options.type + "-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
             }else{
