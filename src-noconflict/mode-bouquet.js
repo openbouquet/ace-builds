@@ -1049,13 +1049,18 @@ ace.define("ace/mode/bouquet",["require","exports","module","ace/lib/oop","ace/m
             return squid_api.getSelectedProject().then(function (project) {
                 //worker.changeOptions({url : "https://localhost"})
                 worker.attachToDocument(session.getDocument());
-
-                squid_api.getSelectedDomain().then(function (domain) {
-                    worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id,domainId:domain.id}]);
-                }, function(error){
-                    //no domain selected
-                    worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id}]);
-                });
+                if(session.type == "dimensions" || session.type == "metrics"){
+                    squid_api.getSelectedDomain().then(function (domain) {
+                        worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id,domainId:domain.id, type:session.type}]);
+                    });
+                }else if (session.type == "domains") {
+                    //Ignoring current domain
+                    worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id, type:session.type}]);
+                } else{
+                    squid_api.getSelectedDomain().then(function (domain) {
+                        worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id,domainId:domain.id, type:session.type}]);
+                    });
+                }
 
 
                 worker.on("annotate", function (results) {
