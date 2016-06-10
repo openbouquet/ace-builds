@@ -1648,7 +1648,6 @@ Autocomplete.startCommand = {
             editor.completer = new Autocomplete();
         editor.completer.autoInsert = false;
         editor.completer.autoSelect = true;
-        editor.completer.
         editor.completer.showPopup(editor);
         editor.completer.cancelContextMenu();
     },
