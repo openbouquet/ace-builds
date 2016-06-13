@@ -1077,7 +1077,10 @@ ace.define("ace/mode/bouquet",["require","exports","module","ace/lib/oop","ace/m
                         }else{
                             session.addMarker(new Range(results.data[0].row, results.data[0].column, results.data[0].row, results.data[0].end_column), "ace_highlight-marker", "text", false);
                         }
+                        // No need to test for open popup
+                        //if (!e.editor.completer.getPopup().isOpen) {
                         session.setAnnotations(results.data);
+                        
                     }else{
                         session.clearAnnotations();
                     }
