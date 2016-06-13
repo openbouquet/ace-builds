@@ -1678,8 +1678,11 @@ var FilteredList = function(array, filterText) {
         this.filterText = str;
         matches = this.filterCompletions(matches, this.filterText);
         matches = matches.sort(function(a, b) {
-            return b.exactMatch - a.exactMatch || b.score - a.score;
+            return b.exactMatch - a.exactMatch || a.name.localeCompare(b.name);
         });
+        // Dont use score for sorting 
+        // Confusing for the users
+        // || b.score - a.score
         var prev = null;
         matches = matches.filter(function(item){
             var caption = item.snippet || item.caption || item.value;
