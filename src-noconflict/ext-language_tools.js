@@ -1482,19 +1482,27 @@ var Autocomplete = function() {
 
         var matches = [];
         var total = editor.completers.length;
-        editor.completers.forEach(function(completer, i) {
-            completer.getCompletions(editor, session, pos, prefix, function(err, results) {
-                if (!err && results)
-                    matches = matches.concat(results);
-                var pos = editor.getCursorPosition();
-                var line = session.getLine(pos.row);
-                callback(null, {
-                    prefix: prefix,
-                    matches: matches,
-                    finished: (--total === 0)
+        if(session.getState(pos.row) == "comment1"){
+            // Do no completion it is a multiline comment
+
+        }else if (session.getLine(pos.row).startsWith("//")){
+            // Single line comment
+            
+        }else{
+            editor.completers.forEach(function(completer, i) {
+                completer.getCompletions(editor, session, pos, prefix, function(err, results) {
+                    if (!err && results)
+                        matches = matches.concat(results);
+                    var pos = editor.getCursorPosition();
+                    var line = session.getLine(pos.row);
+                    callback(null, {
+                        prefix: prefix,
+                        matches: matches,
+                        finished: (--total === 0)
+                    });
                 });
             });
-        });
+        }
         return true;
     };
 
