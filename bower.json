@@ -12,12 +12,7 @@
     "lrabiet <lrabiet@squid>"
   ],
   "main": [
-        "src-noconflict/ace.js",
-        "src-noconflict/ext-language_tools.js",
-        "src-noconflict/mode-bouquet.js",
-        "src-noconflict/worker-bouquet.js",
-        "src-noconflict/snippets/text.js",
-        "src-noconflict/snippets/bouquet.js"
+        "src-noconflict/ace.js"
   ],
   "private": true,
   "dependencies": {
