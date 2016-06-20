@@ -1678,11 +1678,17 @@ var FilteredList = function(array, filterText) {
         this.filterText = str;
         matches = this.filterCompletions(matches, this.filterText);
         matches = matches.sort(function(a, b) {
-            return b.exactMatch - a.exactMatch || a.name.localeCompare(b.name);
+            if(b.exactMatch - a.exactMatch == 0){
+                return 0;
+            } else if (a.score==b.score){
+                a.name.localeCompare(b.name)
+            } else {
+                return a.score-b.score
+            };
         });
         // Dont use score for sorting 
         // Confusing for the users
-        // || b.score - a.score
+        //  b.exactMatch - a.exactMatch || b.score - a.score
         var prev = null;
         matches = matches.filter(function(item){
             var caption = item.snippet || item.caption || item.value;
