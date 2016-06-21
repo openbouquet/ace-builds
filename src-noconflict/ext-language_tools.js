@@ -295,7 +295,7 @@ var SnippetManager = function() {
             var isNested = value.some(function(t) {return typeof t === "object"});          
             if (isNested && !ts.value) {
                 ts.value = value;
-            } else if (value.length && (!ts.value || typeof ts.value !== "string")) {
+            } else if (value.length && (!ts.value || (typeof ts.value[1] !== "string"))) {
                 ts.value = value.join("");
             }
         });
