@@ -24,6 +24,13 @@ var SnippetManager = function() {
                 return [{tabstopId: parseInt(str, 10)}];
             return [{text: str}];
         }
+        function stopToken(str, _, stack) {
+            return [{tabstopId: parseInt(str, 10)}];
+        }
+        function TypeToken(str, _, stack) {
+            return [{tabstopId: -1, type: str}];
+            
+        }
         function escape(ch) {
             return "(?:[^\\\\" + ch + "]|\\\\.)";
         }
@@ -55,6 +62,7 @@ var SnippetManager = function() {
 
                     return [val];
                 }},
+                
                 {regex: /}/, onMatch: function(val, state, stack) {
                     return [stack.length ? stack.shift() : val];
                 }},
@@ -63,8 +71,11 @@ var SnippetManager = function() {
                     var t = TabstopToken(str.substr(1), state, stack);
                     stack.unshift(t[0]);
                     return t;
-                }, next: "snippetVar"},
+                }, next: "typeVar"},
                 {regex: /\n/, token: "newline", merge: false}
+            ],
+            typeVar: [
+                {regex: /(\w+)/, onMatch: TypeToken, next: "snippetVar"},
             ],
             snippetVar: [
                 {regex: "\\|" + escape("\\|") + "*\\|", onMatch: function(val, state, stack) {
@@ -252,17 +263,27 @@ var SnippetManager = function() {
                 return x.replace(/\t/g, tabString);
             return x;
         });
+        tokens = tokens.filter(function(value){
+            return value != ":";
+        });
         var tabstops = [];
         tokens.forEach(function(p, i) {
             if (typeof p != "object")
                 return;
             var id = p.tabstopId;
-            var ts = tabstops[id];
-            if (!ts) {
-                ts = tabstops[id] = [];
+            /*if(id == -1 && p.type){ // type
+                var ts = [];
                 ts.index = id;
                 ts.value = "";
-            }
+                ts.type = p.type;
+            } else {*/
+                var ts = tabstops[id];
+                if (!ts) {
+                    ts = tabstops[id] = [];
+                    ts.index = id;
+                    ts.value = "";
+                }
+            //}
             if (ts.indexOf(p) !== -1)
                 return;
             ts.push(p);
@@ -288,7 +309,11 @@ var SnippetManager = function() {
                     if (expanding[p.tabstopId])
                         continue;
                     var j = val.lastIndexOf(p, i - 1);
-                    p = copy[j] || {tabstopId: p.tabstopId};
+                    if(p.type){
+                        p = copy[j] || {tabstopId: p.tabstopId, type: p.type};
+                    } else {
+                        p = copy[j] || {tabstopId: p.tabstopId};
+                    }
                 }
                 copy[i] = p;
             }
@@ -702,6 +727,12 @@ var TabstopManager = function(editor) {
         var lead = this.editor.selection.lead;
         var anchor = this.editor.selection.anchor;
         var isEmpty = this.editor.selection.isEmpty();
+        if(!isEmpty){
+            if(this.editor.completer && this.tabstops[this.index] && this.tabstops[this.index].value && this.tabstops[this.index].value[0].type){
+                this.editor.completer.detach();
+                this.editor.completer.showPopupFilterByType(this.tabstops[this.index].value[0].type, this.editor);
+            }
+        }
         for (var i = this.ranges.length; i--;) {
             if (this.ranges[i].linked)
                 continue;
@@ -734,7 +765,6 @@ var TabstopManager = function(editor) {
         ts = this.tabstops[this.index];
         if (!ts || !ts.length)
             return;
-        
         this.selectedTabstop = ts;
         if (!this.editor.inVirtualSelectionMode) {        
             var sel = this.editor.multiSelect;
@@ -749,7 +779,6 @@ var TabstopManager = function(editor) {
         } else {
             this.editor.selection.setRange(ts.firstNonLinked);
         }
-        
         this.editor.keyBinding.addKeyboardHandler(this.keyboardHandler);
     };
     this.addTabstops = function(tabstops, start, end) {
@@ -1470,6 +1499,42 @@ var Autocomplete = function() {
         "PageDown": function(editor) { editor.completer.popup.gotoPageDown(); }
     };
 
+    this.gatherCompletionsWithoutPrefix = function(editor, callback) {
+        var session = editor.getSession();
+        var pos = editor.getCursorPosition();
+
+        var line = session.getLine(pos.row);
+        var prefix = ""; //util.getCompletionPrefix(editor);
+
+        this.base = session.doc.createAnchor(pos.row, pos.column - prefix.length);
+        this.base.$insertRight = true;
+
+        var matches = [];
+        var total = editor.completers.length;
+        if(session.getState(pos.row) == "comment1"){
+            // Do no completion it is a multiline comment
+
+        }else if (session.getLine(pos.row).startsWith("//")){
+            // Single line comment
+            
+        }else{
+            editor.completers.forEach(function(completer, i) {
+                completer.getCompletions(editor, session, pos, prefix, function(err, results) {
+                    if (!err && results)
+                        matches = matches.concat(results);
+                    var pos = editor.getCursorPosition();
+                    var line = session.getLine(pos.row);
+                    callback(null, {
+                        prefix: prefix,
+                        matches: matches,
+                        finished: (--total === 0)
+                    });
+                });
+            });
+        }
+        return true;
+    };
+
     this.gatherCompletions = function(editor, callback) {
         var session = editor.getSession();
         var pos = editor.getCursorPosition();
@@ -1525,6 +1590,79 @@ var Autocomplete = function() {
         editor.on("mousewheel", this.mousewheelListener);
 
         this.updateCompletions();
+    };
+
+    this.showPopupFilterByType = function(type, editor) {
+        if (this.editor)
+            this.detach();
+
+        this.activated = true;
+
+        this.editor = editor;
+        if (editor.completer != this) {
+            if (editor.completer)
+                editor.completer.detach();
+            editor.completer = this;
+        }
+
+        editor.on("changeSelection", this.changeListener);
+        editor.on("blur", this.blurListener);
+        editor.on("mousedown", this.mousedownListener);
+        editor.on("mousewheel", this.mousewheelListener);
+
+        this.updateCompletionsUsingType(type);
+    };
+
+    this.updateCompletionsUsingType = function(type) {
+        var keepPopupPosition = false;
+        if (keepPopupPosition && this.base && this.completions) {
+            var pos = this.editor.getCursorPosition();
+            var prefix = this.editor.session.getTextRange({start: this.base, end: pos});
+            if (prefix == this.completions.filterText)
+                return;
+            this.completions.setFilter(prefix);
+            this.completions.filterByType(type);
+            if (!this.completions.filtered.length)
+                return this.detach();
+            if (this.completions.filtered.length == 1
+            && this.completions.filtered[0].value == prefix
+            && !this.completions.filtered[0].snippet)
+                return this.detach();
+            this.openPopup(this.editor, prefix, keepPopupPosition);
+            return;
+        }
+        var _id = this.gatherCompletionsId;
+        this.gatherCompletionsWithoutPrefix(this.editor, function(err, results) {
+            var detachIfFinished = function() {
+                if (!results.finished) return;
+                return this.detach();
+            }.bind(this);
+
+            var prefix = results.prefix;
+            var matches = results && results.matches;
+
+            if (!matches || !matches.length)
+                return detachIfFinished();
+            if (prefix.indexOf(results.prefix) !== 0 || _id != this.gatherCompletionsId)
+                return;
+
+            this.completions = new FilteredList(matches);
+
+            if (this.exactMatch)
+                this.completions.exactMatch = true;
+
+            this.completions.setFilter(prefix);
+            this.completions.filterByType(type);
+            var filtered = this.completions.filtered;
+            if (!filtered.length)
+                return detachIfFinished();
+            if (filtered.length == 1 && filtered[0].value == prefix && !filtered[0].snippet)
+                return detachIfFinished();
+            if (this.autoInsert && filtered.length == 1 && results.finished)
+                return this.insertMatch(filtered[0]);
+
+            this.openPopup(this.editor, prefix, keepPopupPosition);
+        }.bind(this));
     };
 
     this.updateCompletions = function(keepPopupPosition) {
@@ -1698,6 +1836,21 @@ var FilteredList = function(array, filterText) {
         });
 
         this.filtered = matches;
+    };
+    this.filterByType = function(type){
+        this.filtered = this.filtered.filter(function(value){
+            return value.meta == type
+        });
+        this.filtered = this.filtered.sort(function(a, b) {
+            if(b.exactMatch - a.exactMatch == 0){
+                return 0;
+            } else if (a.score==b.score){
+                a.name.localeCompare(b.name)
+            } else {
+                return a.score-b.score
+            };
+        });
+
     };
     this.filterCompletions = function(items, needle) {
         var results = [];
