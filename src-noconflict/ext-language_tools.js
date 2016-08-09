@@ -982,7 +982,7 @@ var AcePopup = function(parentNode) {
     popup.renderer.$cursorLayer.restartTimer = noop;
     popup.renderer.$cursorLayer.element.style.opacity = 0;
 
-    popup.renderer.$maxLines = 20;
+    popup.renderer.$maxLines = 15;
     popup.renderer.$keepTextAreaAtCursor = false;
 
     popup.setHighlightActiveLine(false);
