@@ -1829,9 +1829,7 @@ var FilteredList = function(array, filterText) {
         this.filterText = str;
         matches = this.filterCompletions(matches, this.filterText);
         matches = matches.sort(function(a, b) {
-            if(b.exactMatch - a.exactMatch == 0){
-                return 0;
-            } else if (a.score==b.score){
+            if (a.score==b.score){
                 a.name.localeCompare(b.name)
             } else {
                 return a.score-b.score
