@@ -1324,6 +1324,7 @@ var Autocomplete = function() {
     this.autoInsert = false;
     this.autoSelect = true;
     this.exactMatch = false;
+    this.minimumRank = 0;
     this.gatherCompletionsId = 0;
     this.keyboardHandler = new HashHandler();
     this.keyboardHandler.bindKeys(this.commands);
@@ -1806,11 +1807,12 @@ Autocomplete.startCommand = {
         if (!editor.completer)
             editor.completer = new Autocomplete();
         editor.completer.autoInsert = false;
+        editor.completer.minimumRank = 1;
         editor.completer.autoSelect = true;
         editor.completer.showPopup(editor);
         editor.completer.cancelContextMenu();
     },
-    bindKey: "Ctrl-Space Ctrl-Space"
+    bindKey: "Ctrl-Space f"
 };
 
 var FilteredList = function(array, filterText) {
@@ -1846,6 +1848,11 @@ var FilteredList = function(array, filterText) {
             return true;
         });
 
+        matches = matches.filter(function(item){
+            return item.score>=this.minimumRank
+        });
+
+
         this.filtered = matches;
     };
     this.filterByType = function(type){
@@ -1853,9 +1860,7 @@ var FilteredList = function(array, filterText) {
             return value.meta == type
         });
         this.filtered = this.filtered.sort(function(a, b) {
-            if(b.exactMatch - a.exactMatch == 0){
-                return 0;
-            } else if (a.score==b.score){
+            if (a.score==b.score){
                 a.name.localeCompare(b.name)
             } else {
                 return a.score-b.score
