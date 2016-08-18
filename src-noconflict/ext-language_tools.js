@@ -1797,7 +1797,7 @@ Autocomplete.startCommand = {
         editor.completer.showPopup(editor);
         editor.completer.cancelContextMenu();
     },
-    bindKey: "Ctrl-Shift-Space|Alt-Space"
+    bindKey: "Ctrl-Space|Ctrl-Shift-Space|Alt-Space"
 };
 
 Autocomplete.startCommand = {
