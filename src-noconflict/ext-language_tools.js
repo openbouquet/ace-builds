@@ -1832,7 +1832,7 @@ var FilteredList = function(array, filterText) {
             if (a.score==b.score){
                 a.name.localeCompare(b.name)
             } else {
-                return a.score-b.score
+                return b.score-a.score
             };
         });
         // Dont use score for sorting 
