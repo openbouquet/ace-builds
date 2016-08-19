@@ -1798,7 +1798,7 @@ Autocomplete.startCommand = {
         editor.completer.showPopup(editor);
         editor.completer.cancelContextMenu();
     },
-    bindKey: "Ctrl-Space|Ctrl-Shift-Space|Alt-Space"
+    bindKey: "Ctrl-Space|Ctrl-Shift-Space"
 };
 
 Autocomplete.startCommand = {
@@ -1812,7 +1812,7 @@ Autocomplete.startCommand = {
         editor.completer.showPopup(editor);
         editor.completer.cancelContextMenu();
     },
-    bindKey: "Ctrl-Space f"
+    bindKey: "Alt-Space"
 };
 
 var FilteredList = function(array, filterText) {
@@ -1848,6 +1848,7 @@ var FilteredList = function(array, filterText) {
             return true;
         });
 
+        this.minimumRank=1;
         matches = matches.filter(function(item){
             return item.score>=this.minimumRank
         });
