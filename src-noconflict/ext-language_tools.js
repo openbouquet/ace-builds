@@ -1798,21 +1798,7 @@ Autocomplete.startCommand = {
         editor.completer.showPopup(editor);
         editor.completer.cancelContextMenu();
     },
-    bindKey: "Ctrl-Space|Ctrl-Shift-Space"
-};
-
-Autocomplete.startCommand = {
-    name: "startAutocomplete",
-    exec: function(editor) {
-        if (!editor.completer)
-            editor.completer = new Autocomplete();
-        editor.completer.autoInsert = false;
-        editor.completer.minimumRank = 1;
-        editor.completer.autoSelect = true;
-        editor.completer.showPopup(editor);
-        editor.completer.cancelContextMenu();
-    },
-    bindKey: "Alt-Space"
+    bindKey: "Ctrl-Space|Alt-Space|Ctrl-Shift-Space"
 };
 
 var FilteredList = function(array, filterText) {
@@ -1865,7 +1851,7 @@ var FilteredList = function(array, filterText) {
             if (a.score==b.score){
                 a.name.localeCompare(b.name)
             } else {
-                return a.score-b.score
+                return b.score-a.score
             };
         });
 
