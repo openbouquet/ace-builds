@@ -1848,10 +1848,11 @@ var FilteredList = function(array, filterText) {
             return true;
         });
 
-        this.minimumRank=1;
-        matches = matches.filter(function(item){
-            return item.score>=this.minimumRank
-        });
+        if(this.minimumRank){
+            matches = matches.filter(function(item){
+                return item.score>=this.minimumRank
+            });
+        }
 
 
         this.filtered = matches;
