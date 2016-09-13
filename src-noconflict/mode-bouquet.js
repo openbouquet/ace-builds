@@ -1049,19 +1049,33 @@ ace.define("ace/mode/bouquet",["require","exports","module","ace/lib/oop","ace/m
             return squid_api.getSelectedProject().then(function (project) {
                 //worker.changeOptions({url : "https://localhost"})
                 worker.attachToDocument(session.getDocument());
+                var option = {
+                        "squid_apiUrl": squid_api.apiURL,
+                        "tokenId":squid_api.model.login.get("accessToken"),
+                        "projectId":project.id,
+                        "type" : session.type
+                };
                 if(session.type == "dimensions" || session.type == "metrics"){
                     squid_api.getSelectedDomain().then(function (domain) {
-                        worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id,domainId:domain.id, type:session.type}]);
+                        option.domainId = domain.id;
+                        worker.call("setOptions",[option]);
                     });
-                }else if (session.type == "domains" || session.type == "relations" ) {
+                } else if (session.type == "domains") {
                     //Ignoring current domain
-                    worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id, type:session.type}]);
+                    worker.call("setOptions",[option]);
+                } else if (session.type == "relations" ) {
+                    // set relation domains
+                    project.get("relations").load(squid_api.model.config.get("relation")).then(function(relation) {
+                        option.leftDomainId = relation.get("leftId").domainId;
+                        option.rightDomainId = relation.get("rightId").domainId;
+                        worker.call("setOptions",[option]);
+                    });        
                 } else{
                     squid_api.getSelectedDomain().then(function (domain) {
-                        worker.call("setOptions",[{squid_apiUrl: squid_api.apiURL,tokenId:squid_api.model.login.get("accessToken"),projectId:project.id,domainId:domain.id, type:session.type}]);
+                        option.domainId = domain.id;
+                        worker.call("setOptions",[option]);
                     });
                 }
-
 
                 worker.on("annotate", function (results) {
                     var markers = session.getMarkers(false);

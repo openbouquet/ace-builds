@@ -11827,14 +11827,21 @@ ace.define("ace/mode/bouquet_worker",["require","exports","module", "ace/lib/oop
             this.errors = [];
 
             var oReq = new XMLHttpRequest();
-
-            if(this.options.type == "domains" || this.options.type == "relations" ){
-                this.url = this.options.squid_apiUrl + "/projects/" + this.options.projectId + "/"+this.options.type+"-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
-            } else if(this.options.domainId && this.options.type){
-                this.url = this.options.squid_apiUrl + "/projects/" + this.options.projectId + "/domains/" + this.options.domainId + "/" + this.options.type + "-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
+            
+            this.url = this.options.squid_apiUrl + "/projects/" + this.options.projectId;
+            if (this.options.type == "domains") {
+                this.url += "/"+this.options.type+"-suggestion?access_token=" + this.options.tokenId;
+                this.url += "&expression=" + encodeURIComponent(value);
+            } else if (this.options.type == "relations" ){
+                this.url += "/"+this.options.type+"-suggestion?access_token=" + this.options.tokenId;
+                this.url += "&expression=" + encodeURIComponent(value);
+                this.url += "&leftDomainId=" + encodeURIComponent(this.options.leftDomainId);
+                this.url += "&rightDomainId=" + encodeURIComponent(this.options.rightDomainId);
+            }else if(this.options.domainId && this.options.type){
+                this.url += "/domains/" + this.options.domainId + "/" + this.options.type + "-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
             }else{
-                this.url = this.options.squid_apiUrl + "/projects/" + this.options.projectId + "/domains-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
-            };
+                this.url += "/domains-suggestion?access_token=" + this.options.tokenId + "&expression=" + encodeURIComponent(value);
+            }
             oReq.addEventListener("load", this.reqListener);
             oReq.open("GET", this.url, false); //synchrone to get the results and modify globally the workers and the editor.
             oReq.send();
