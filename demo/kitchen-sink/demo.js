@@ -28,7 +28,7 @@ exports.contextMenuHandler = function(e){
     });
 
     host.textInput.setInputHandler(function(newVal) {
-        console.log(newVal , value, text.selectionStart, text.selectionEnd)
+        console.log(newVal , value, text.selectionStart, text.selectionEnd);
         if (newVal == value)
             return '';
         if (newVal.lastIndexOf(value, 0) === 0)
@@ -867,8 +867,10 @@ define("ace/test/mockrenderer",["require","exports","module"], function(require,
 "use strict";
 
 var MockRenderer = exports.MockRenderer = function(visibleRowCount) {
-    this.container = document.createElement("div");
-    this.scroller = document.createElement("div");
+    if (typeof document == "object") {
+        this.container = document.createElement("div");
+        this.scroller = document.createElement("div");
+    }
     this.visibleRowCount = visibleRowCount || 20;
 
     this.layerConfig = {
@@ -1026,14 +1028,14 @@ MockRenderer.prototype.textToScreenCoordinates = function() {
     return {
         pageX: 0,
         pageY: 0
-    }
+    };
 };
 
 MockRenderer.prototype.screenToTextCoordinates = function() {
     return {
         row: 0,
         column: 0
-    }
+    };
 };
 
 MockRenderer.prototype.adjustWrapLimit = function () {
@@ -1274,6 +1276,7 @@ var supportedModes = {
     Assembly_x86:["asm|a"],
     AutoHotKey:  ["ahk"],
     BatchFile:   ["bat|cmd"],
+    Bro:         ["bro"],
     C_Cpp:       ["cpp|c|cc|cxx|h|hh|hpp|ino"],
     C9Search:    ["c9search_results"],
     Cirru:       ["cirru|cr"],
@@ -1282,6 +1285,9 @@ var supportedModes = {
     coffee:      ["coffee|cf|cson|^Cakefile"],
     ColdFusion:  ["cfm"],
     CSharp:      ["cs"],
+    Csound_Document: ["csd"],
+    Csound_Orchestra: ["orc"],
+    Csound_Score: ["sco"],
     CSS:         ["css"],
     Curly:       ["curly"],
     D:           ["d|di"],
@@ -1289,6 +1295,7 @@ var supportedModes = {
     Diff:        ["diff|patch"],
     Dockerfile:  ["^Dockerfile"],
     Dot:         ["dot"],
+    Drools:      ["drl"],
     Dummy:       ["dummy"],
     DummySyntax: ["dummy"],
     Eiffel:      ["e|ge"],
@@ -1296,35 +1303,40 @@ var supportedModes = {
     Elixir:      ["ex|exs"],
     Elm:         ["elm"],
     Erlang:      ["erl|hrl"],
-    Forth:       ["frt|fs|ldr"],
+    Forth:       ["frt|fs|ldr|fth|4th"],
+    Fortran:     ["f|f90"],
     FTL:         ["ftl"],
     Gcode:       ["gcode"],
     Gherkin:     ["feature"],
     Gitignore:   ["^.gitignore"],
     Glsl:        ["glsl|frag|vert"],
-    Gobstones:   ["gbs"], 
+    Gobstones:   ["gbs"],
     golang:      ["go"],
+    GraphQLSchema: ["gql"],
     Groovy:      ["groovy"],
     HAML:        ["haml"],
     Handlebars:  ["hbs|handlebars|tpl|mustache"],
     Haskell:     ["hs"],
+    Haskell_Cabal:     ["cabal"],
     haXe:        ["hx"],
-    HTML:        ["html|htm|xhtml"],
+    Hjson:       ["hjson"],
+    HTML:        ["html|htm|xhtml|vue|we|wpy"],
     HTML_Elixir: ["eex|html.eex"],
     HTML_Ruby:   ["erb|rhtml|html.erb"],
     INI:         ["ini|conf|cfg|prefs"],
     Io:          ["io"],
     Jack:        ["jack"],
-    Jade:        ["jade"],
+    Jade:        ["jade|pug"],
     Java:        ["java"],
     JavaScript:  ["js|jsm|jsx"],
     JSON:        ["json"],
     JSONiq:      ["jq"],
     JSP:         ["jsp"],
+    JSSM:        ["jssm|jssm_state"],
     JSX:         ["jsx"],
     Julia:       ["jl"],
+    Kotlin:      ["kt|kts"],
     LaTeX:       ["tex|latex|ltx|bib"],
-    Lean:        ["lean|hlean"],
     LESS:        ["less"],
     Liquid:      ["liquid"],
     Lisp:        ["lisp"],
@@ -1350,6 +1362,7 @@ var supportedModes = {
     Perl:        ["pl|pm"],
     pgSQL:       ["pgsql"],
     PHP:         ["php|phtml|shtml|php3|php4|php5|phps|phpt|aw|ctp|module"],
+    Pig:         ["pig"],
     Powershell:  ["ps1"],
     Praat:       ["praat|praatscript|psc|proc"],
     Prolog:      ["plg|prolog"],
@@ -1357,8 +1370,9 @@ var supportedModes = {
     Protobuf:    ["proto"],
     Python:      ["py"],
     R:           ["r"],
-    Razor:       ["cshtml"],
+    Razor:       ["cshtml|asp"],
     RDoc:        ["Rd"],
+    Red:         ["red|reds"],
     RHTML:       ["Rhtml"],
     RST:         ["rst"],
     Ruby:        ["rb|ru|gemspec|rake|^Guardfile|^Rakefile|^Gemfile"],
@@ -1384,6 +1398,7 @@ var supportedModes = {
     Text:        ["txt"],
     Textile:     ["textile"],
     Toml:        ["toml"],
+    TSX:         ["tsx"],
     Twig:        ["twig|swig"],
     Typescript:  ["ts|typescript|str"],
     Vala:        ["vala"],
@@ -1403,6 +1418,9 @@ var nameOverrides = {
     CSharp: "C#",
     golang: "Go",
     C_Cpp: "C and C++",
+    Csound_Document: "Csound Document",
+    Csound_Orchestra: "Csound",
+    Csound_Score: "Csound Score",
     coffee: "CoffeeScript",
     HTML_Ruby: "HTML (Ruby)",
     HTML_Elixir: "HTML (Elixir)",
@@ -1640,7 +1658,7 @@ exports.$detectIndentation = function(lines, fallback) {
         return score;
     }
 
-    var changesTotal = changes.reduce(function(a,b){return a+b}, 0);
+    var changesTotal = changes.reduce(function(a,b){return a+b;}, 0);
 
     var first = {score: 0, length: 0};
     var spaceIndents = 0;
@@ -1684,16 +1702,37 @@ exports.detectIndentation = function(session) {
         session.setTabSize(indent.length);
     return indent;
 };
-
-exports.trimTrailingSpace = function(session, trimEmpty) {
+exports.trimTrailingSpace = function(session, options) {
     var doc = session.getDocument();
     var lines = doc.getAllLines();
     
-    var min = trimEmpty ? -1 : 0;
+    var min = options && options.trimEmpty ? -1 : 0;
+    var cursors = [], ci = -1;
+    if (options && options.keepCursorPosition) {
+        if (session.selection.rangeCount) {
+            session.selection.rangeList.ranges.forEach(function(x, i, ranges) {
+               var next = ranges[i + 1];
+               if (next && next.cursor.row == x.cursor.row)
+                  return;
+              cursors.push(x.cursor);
+            });
+        } else {
+            cursors.push(session.selection.getCursor());
+        }
+        ci = 0;
+    }
+    var cursorRow = cursors[ci] && cursors[ci].row;
 
     for (var i = 0, l=lines.length; i < l; i++) {
         var line = lines[i];
         var index = line.search(/\s+$/);
+
+        if (i == cursorRow) {
+            if (index < cursors[ci].column && index > min)
+               index = cursors[ci].column;
+            ci++;
+            cursorRow = cursors[ci] ? cursors[ci].row : -1;
+        }
 
         if (index > min)
             doc.removeInLine(i, index, line.length);
@@ -1935,8 +1974,11 @@ function saveDoc(name, callback) {
 }
 
 function upload(url, data, callback) {
-    url = net.qualifyURL(url);
-    if (!/https?:/.test(url))
+    var absUrl = net.qualifyURL(url);
+    if (/^file:/.test(absUrl))
+        absUrl = "http://localhost:8888/" + url;
+    url = absUrl
+    if (!/^https?:/.test(url))
         return callback(new Error("Unsupported url scheme"));
     var xhr = new XMLHttpRequest();
     xhr.open("PUT", url, true);
@@ -1990,6 +2032,8 @@ var themeData = [
     ["Chaos"                ,"chaos"                   ,  "dark"],
     ["Clouds Midnight"      ,"clouds_midnight"         ,  "dark"],
     ["Cobalt"               ,"cobalt"                  ,  "dark"],
+    ["Gruvbox"              ,"gruvbox"                 ,  "dark"],
+    ["Green on Black"       ,"gob"                     ,  "dark"],
     ["idle Fingers"         ,"idle_fingers"            ,  "dark"],
     ["krTheme"              ,"kr_theme"                ,  "dark"],
     ["Merbivore"            ,"merbivore"               ,  "dark"],
@@ -2785,7 +2829,7 @@ oop.inherits(Occur, Search);
         var translatedPos = this.originalToOccurPosition(editor.session, pos);
         editor.moveCursorToPosition(translatedPos);
         return true;
-    }
+    };
     this.exit = function(editor, options) {
         var pos = options.translatePosition && editor.getCursorPosition();
         var translatedPos = pos && this.occurToOriginalPosition(editor.session, pos);
@@ -2793,14 +2837,14 @@ oop.inherits(Occur, Search);
         if (translatedPos)
             editor.moveCursorToPosition(translatedPos);
         return true;
-    }
+    };
 
     this.highlight = function(sess, regexp) {
         var hl = sess.$occurHighlight = sess.$occurHighlight || sess.addDynamicMarker(
                 new SearchHighlight(null, "ace_occur-highlight", "text"));
         hl.setRegexp(regexp);
         sess._emit("changeBackMarker"); // force highlight layer redraw
-    }
+    };
 
     this.displayOccurContent = function(editor, options) {
         this.$originalSession = editor.session;
@@ -2814,12 +2858,12 @@ oop.inherits(Occur, Search);
         occurSession.$useEmacsStyleLineStart = this.$useEmacsStyleLineStart;
         this.highlight(occurSession, options.re);
         occurSession._emit('changeBackMarker');
-    }
+    };
 
     this.displayOriginalContent = function(editor) {
         editor.setSession(this.$originalSession);
         this.$originalSession.$useEmacsStyleLineStart = this.$useEmacsStyleLineStart;
-    }
+    };
     this.originalToOccurPosition = function(session, pos) {
         var lines = session.$occurMatchingLines;
         var nullPos = {row: 0, column: 0};
@@ -2829,13 +2873,13 @@ oop.inherits(Occur, Search);
                 return {row: i, column: pos.column};
         }
         return nullPos;
-    }
+    };
     this.occurToOriginalPosition = function(session, pos) {
         var lines = session.$occurMatchingLines;
         if (!lines || !lines[pos.row])
             return pos;
         return {row: lines[pos.row].row, column: pos.column};
-    }
+    };
 
     this.matchingLines = function(session, options) {
         options = oop.mixin({}, options);
@@ -2849,7 +2893,7 @@ oop.inherits(Occur, Search);
                 lines :
                 lines.concat({row: row, content: session.getLine(row)});
         }, []);
-    }
+    };
 
 }).call(Occur.prototype);
 
@@ -2925,13 +2969,13 @@ oop.inherits(OccurKeyboardHandler, HashHandler);
     this.attach = function(editor) {
         HashHandler.call(this, occurCommands, editor.commands.platform);
         this.$editor = editor;
-    }
+    };
 
     var handleKeyboard$super = this.handleKeyboard;
     this.handleKeyboard = function(data, hashId, key, keyCode) {
         var cmd = handleKeyboard$super.call(this, data, hashId, key, keyCode);
         return (cmd && cmd.command) ? cmd : undefined;
-    }
+    };
 
 }).call(OccurKeyboardHandler.prototype);
 
@@ -2939,14 +2983,14 @@ OccurKeyboardHandler.installIn = function(editor) {
     var handler = new this();
     editor.keyBinding.addKeyboardHandler(handler);
     editor.commands.addCommands(occurCommands);
-}
+};
 
 OccurKeyboardHandler.uninstallFrom = function(editor) {
     editor.commands.removeCommands(occurCommands);
     var handler = editor.getKeyboardHandler();
     if (handler.isOccurHandler)
         editor.keyBinding.removeKeyboardHandler(handler);
-}
+};
 
 exports.occurStartCommand = occurStartCommand;
 
@@ -3160,7 +3204,7 @@ function regExpToObject(re) {
     return {
         expression: string.slice(start+1, flagStart),
         flags: string.slice(flagStart+1)
-    }
+    };
 }
 
 function stringToRegExp(string, flags) {
@@ -3728,17 +3772,15 @@ define("ace/keyboard/vim",["require","exports","module","ace/range","ace/lib/eve
     return this.ace.inVirtualSelectionMode && this.ace.selection.index;
   };
   this.onChange = function(delta) {
-    if (delta.action[0] == 'i') {
-      var change = { text: delta.lines };
-      var curOp = this.curOp = this.curOp || {};
-      if (!curOp.changeHandlers)
-        curOp.changeHandlers = this._eventRegistry["change"] && this._eventRegistry["change"].slice();
-      if (this.virtualSelectionMode()) return;
-      if (!curOp.lastChange) {
-        curOp.lastChange = curOp.change = change;
-      } else {
-        curOp.lastChange.next = curOp.lastChange = change;
-      }
+    var change = { text: delta.action[0] == 'i' ? delta.lines : [] };
+    var curOp = this.curOp = this.curOp || {};
+    if (!curOp.changeHandlers)
+      curOp.changeHandlers = this._eventRegistry["change"] && this._eventRegistry["change"].slice();
+    if (this.virtualSelectionMode()) return;
+    if (!curOp.lastChange) {
+      curOp.lastChange = curOp.change = change;
+    } else {
+      curOp.lastChange.next = curOp.lastChange = change;
     }
     this.$updateMarkers(delta);
   };
@@ -4438,9 +4480,9 @@ dom.importCssString(".normal-mode .ace_cursor{\
     { keys: '<C-[>', type: 'keyToKey', toKeys: '<Esc>', context: 'insert' },
     { keys: '<C-c>', type: 'keyToKey', toKeys: '<Esc>', context: 'insert' },
     { keys: 's', type: 'keyToKey', toKeys: 'cl', context: 'normal' },
-    { keys: 's', type: 'keyToKey', toKeys: 'xi', context: 'visual'},
+    { keys: 's', type: 'keyToKey', toKeys: 'c', context: 'visual'},
     { keys: 'S', type: 'keyToKey', toKeys: 'cc', context: 'normal' },
-    { keys: 'S', type: 'keyToKey', toKeys: 'dcc', context: 'visual' },
+    { keys: 'S', type: 'keyToKey', toKeys: 'VdO', context: 'visual' },
     { keys: '<Home>', type: 'keyToKey', toKeys: '0' },
     { keys: '<End>', type: 'keyToKey', toKeys: '$' },
     { keys: '<PageUp>', type: 'keyToKey', toKeys: '<C-b>' },
@@ -4533,6 +4575,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
     { keys: 'v', type: 'action', action: 'toggleVisualMode' },
     { keys: 'V', type: 'action', action: 'toggleVisualMode', actionArgs: { linewise: true }},
     { keys: '<C-v>', type: 'action', action: 'toggleVisualMode', actionArgs: { blockwise: true }},
+    { keys: '<C-q>', type: 'action', action: 'toggleVisualMode', actionArgs: { blockwise: true }},
     { keys: 'gv', type: 'action', action: 'reselectLastSelection' },
     { keys: 'J', type: 'action', action: 'joinLines', isEdit: true },
     { keys: 'p', type: 'action', action: 'paste', isEdit: true, actionArgs: { after: true, isEdit: true }},
@@ -4986,7 +5029,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
         exCommandDispatcher.map(lhs, rhs, ctx);
       },
       unmap: function(lhs, ctx) {
-        exCommandDispatcher.unmap(lhs, ctx || "normal");
+        exCommandDispatcher.unmap(lhs, ctx);
       },
       setOption: setOption,
       getOption: getOption,
@@ -5063,8 +5106,12 @@ dom.importCssString(".normal-mode .ace_cursor{\
 
           if (lastInsertModeKeyTimer) { window.clearTimeout(lastInsertModeKeyTimer); }
           if (keysAreChars) {
-            var here = cm.getCursor();
-            cm.replaceRange('', offsetCursor(here, 0, -(keys.length - 1)), here, '+input');
+            var selections = cm.listSelections();
+            for (var i = 0; i < selections.length; i++) {
+              var here = selections[i].head;
+              cm.replaceRange('', offsetCursor(here, 0, -(keys.length - 1)), here, '+input');
+            }
+            vimGlobalState.macroModeState.lastInsertModeChanges.changes.pop();
           }
           clearInputState(cm);
           return match.command;
@@ -5336,7 +5383,9 @@ dom.importCssString(".normal-mode .ace_cursor{\
           }
         }
         if (bestMatch.keys.slice(-11) == '<character>') {
-          inputState.selectedCharacter = lastChar(keys);
+          var character = lastChar(keys);
+          if (/<C-.>/.test(character)) return {type: 'none'};
+          inputState.selectedCharacter = character;
         }
         return {type: 'full', command: bestMatch};
       },
@@ -8096,7 +8145,6 @@ dom.importCssString(".normal-mode .ace_cursor{\
             }
           }
         }
-        throw Error('No such mapping.');
       }
     };
 
@@ -8595,6 +8643,8 @@ dom.importCssString(".normal-mode .ace_cursor{\
       cm.setCursor(cm.getCursor().line, cm.getCursor().ch-1);
       cm.setOption('keyMap', 'vim');
       cm.setOption('disableInput', true);
+      
+      lastChange.overwrite = cm.state.overwrite;
       cm.toggleOverwrite(false); // exit replace mode if we were in it.
       insertModeChangeRegister.setText(lastChange.changes.join(''));
       CodeMirror.signal(cm, "vim-mode-change", {mode: "normal"});
@@ -8707,6 +8757,10 @@ dom.importCssString(".normal-mode .ace_cursor{\
           if (changeObj.origin == '+input' || changeObj.origin == 'paste'
               || changeObj.origin === undefined /* only in testing */) {
             var text = changeObj.text.join('\n');
+            if (lastChange.maybeReset) {
+              lastChange.changes = [];
+              lastChange.maybeReset = false;
+            }
             lastChange.changes.push(text);
           }
           changeObj = changeObj.next;
@@ -8722,7 +8776,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
         if (lastChange.expectCursorActivityForChange) {
           lastChange.expectCursorActivityForChange = false;
         } else {
-          lastChange.changes = [];
+          lastChange.maybeReset = true;
         }
       } else if (!cm.curOp.isVimOp) {
         handleExternalSelection(cm, vim);
@@ -8774,6 +8828,10 @@ dom.importCssString(".normal-mode .ace_cursor{\
       var keyName = CodeMirror.keyName(e);
       if (!keyName) { return; }
       function onKeyFound() {
+        if (lastChange.maybeReset) {
+          lastChange.changes = [];
+          lastChange.maybeReset = false;
+        }
         lastChange.changes.push(new InsertModeKey(keyName));
         return true;
       }
@@ -8797,7 +8855,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
         if (macroModeState.lastInsertModeChanges.changes.length > 0) {
           repeat = !vim.lastEditActionCommand ? 1 : repeat;
           var changeObject = macroModeState.lastInsertModeChanges;
-          repeatInsertModeChanges(cm, changeObject.changes, repeat);
+          repeatInsertModeChanges(cm, changeObject.changes, repeat, changeObject.overwrite);
         }
       }
       vim.inputState = vim.lastEditInputState;
@@ -8819,7 +8877,7 @@ dom.importCssString(".normal-mode .ace_cursor{\
       macroModeState.isPlaying = false;
     }
 
-    function repeatInsertModeChanges(cm, changes, repeat) {
+    function repeatInsertModeChanges(cm, changes, repeat, overwrite) {
       function keyHandler(binding) {
         if (typeof binding == 'string') {
           CodeMirror.commands[binding](cm);
@@ -8848,7 +8906,11 @@ dom.importCssString(".normal-mode .ace_cursor{\
             CodeMirror.lookupKey(change.keyName, 'vim-insert', keyHandler);
           } else {
             var cur = cm.getCursor();
-            cm.replaceRange(change, cur, cur);
+            var end = cur;
+            if (overwrite && !/\n/.test(change)) {
+              end = offsetCursor(cur, 0, change.length);
+            }
+            cm.replaceRange(change, cur, end);
           }
         }
       }
@@ -9201,7 +9263,7 @@ var StatusBar = function(editor, parentNode) {
     parentNode.appendChild(this.element);
 
     var statusUpdate = lang.delayedCall(function(){
-        this.updateStatus(editor)
+        this.updateStatus(editor);
     }.bind(this)).schedule.bind(null, 100);
     
     editor.on("changeStatus", statusUpdate);
@@ -9484,6 +9546,7 @@ var SnippetManager = function() {
         if (cursor.column < indentString.length)
             indentString = indentString.slice(0, cursor.column);
 
+        snippetText = snippetText.replace(/\r/g, "");
         var tokens = this.tokenizeTmSnippet(snippetText);
         tokens = this.resolveVariables(tokens, editor);
         tokens = tokens.map(function(x) {
@@ -9512,14 +9575,14 @@ var SnippetManager = function() {
                 return;
 
             var value = tokens.slice(i + 1, i1);
-            var isNested = value.some(function(t) {return typeof t === "object"});          
+            var isNested = value.some(function(t) {return typeof t === "object";});          
             if (isNested && !ts.value) {
                 ts.value = value;
             } else if (value.length && (!ts.value || typeof ts.value !== "string")) {
                 ts.value = value.join("");
             }
         });
-        tabstops.forEach(function(ts) {ts.length = 0});
+        tabstops.forEach(function(ts) {ts.length = 0;});
         var expanding = {};
         function copyValue(val) {
             var copy = [];
@@ -9561,9 +9624,10 @@ var SnippetManager = function() {
         var text = "";
         tokens.forEach(function(t) {
             if (typeof t === "string") {
-                if (t[0] === "\n"){
-                    column = t.length - 1;
-                    row ++;
+                var lines = t.split("\n");
+                if (lines.length > 1){
+                    column = lines[lines.length - 1].length;
+                    row += lines.length - 1;
                 } else
                     column += t.length;
                 text += t;
@@ -10145,7 +10209,7 @@ var Editor = require("./editor").Editor;
 
 });
 
-define("ace/ext/emmet",["require","exports","module","ace/keyboard/hash_handler","ace/editor","ace/snippets","ace/range","resources","resources","range","tabStops","resources","utils","actions","ace/config","ace/config"], function(require, exports, module) {
+define("ace/ext/emmet",["require","exports","module","ace/keyboard/hash_handler","ace/editor","ace/snippets","ace/range","resources","resources","tabStops","resources","utils","actions","ace/config","ace/config"], function(require, exports, module) {
 "use strict";
 var HashHandler = require("ace/keyboard/hash_handler").HashHandler;
 var Editor = require("ace/editor").Editor;
@@ -10160,7 +10224,8 @@ AceEmmetEditor.prototype = {
         this.indentation = editor.session.getTabString();
         if (!emmet)
             emmet = window.emmet;
-        emmet.require("resources").setVariable("indentation", this.indentation);
+        var resources = emmet.resources || emmet.require("resources");
+        resources.setVariable("indentation", this.indentation);
         this.$syntax = null;
         this.$syntax = this.getSyntax();
     },
@@ -10240,13 +10305,14 @@ AceEmmetEditor.prototype = {
         return syntax;
     },
     getProfileName: function() {
+        var resources = emmet.resources || emmet.require("resources");
         switch (this.getSyntax()) {
           case "css": return "css";
           case "xml":
           case "xsl":
             return "xml";
           case "html":
-            var profile = emmet.require("resources").getVariable("profile");
+            var profile = resources.getVariable("profile");
             if (!profile)
                 profile = this.ace.session.getLines(0,2).join("").search(/<!DOCTYPE[^>]+XHTML/i) != -1 ? "xhtml": "html";
             return profile;
@@ -10268,9 +10334,9 @@ AceEmmetEditor.prototype = {
         var base = 1000;
         var zeroBase = 0;
         var lastZero = null;
-        var range = emmet.require('range');
-        var ts = emmet.require('tabStops');
-        var settings = emmet.require('resources').getVocabulary("user");
+        var ts = emmet.tabStops || emmet.require('tabStops');
+        var resources = emmet.resources || emmet.require("resources");
+        var settings = resources.getVocabulary("user");
         var tabstopOptions = {
             tabstop: function(data) {
                 var group = parseInt(data.group, 10);
@@ -10288,7 +10354,7 @@ AceEmmetEditor.prototype = {
                 var result = '${' + group + (placeholder ? ':' + placeholder : '') + '}';
 
                 if (isZero) {
-                    lastZero = range.create(data.start, result);
+                    lastZero = [data.start, result];
                 }
 
                 return result;
@@ -10305,7 +10371,8 @@ AceEmmetEditor.prototype = {
         if (settings.variables['insert_final_tabstop'] && !/\$\{0\}$/.test(value)) {
             value += '${0}';
         } else if (lastZero) {
-            value = emmet.require('utils').replaceSubstring(value, '${0}', lastZero);
+            var common = emmet.utils ? emmet.utils.common : emmet.require('utils');
+            value = common.replaceSubstring(value, '${0}', lastZero[0], lastZero[1]);
         }
         
         return value;
@@ -10344,7 +10411,7 @@ exports.commands = new HashHandler();
 exports.runEmmetCommand = function runEmmetCommand(editor) {
     try {
         editorProxy.setupContext(editor);
-        var actions = emmet.require("actions");
+        var actions = emmet.actions || emmet.require("actions");
     
         if (this.action == "expand_abbreviation_with_tab") {
             if (!editor.selection.isEmpty())
@@ -10412,7 +10479,7 @@ exports.isAvailable = function(editor, command) {
         } catch(e) {}
     }
     return isSupported;
-}
+};
 
 var onChangeMode = function(e, target) {
     var editor = target;
@@ -10568,7 +10635,7 @@ var AcePopup = function(parentNode) {
         if (selected)
             dom.addCssClass(selected, "ace_selected");
     });
-    var hideHoverMarker = function() { setHoverMarker(-1) };
+    var hideHoverMarker = function() { setHoverMarker(-1); };
     var setHoverMarker = function(row, suppressRedraw) {
         if (row !== hoverMarker.start.row) {
             hoverMarker.start.row = hoverMarker.end.row = row;
@@ -10623,7 +10690,7 @@ var AcePopup = function(parentNode) {
             var maxW = popup.renderer.$size.scrollerWidth / popup.renderer.layerConfig.characterWidth;
             var metaData = data.meta;
             if (metaData.length + data.caption.length > maxW - 2) {
-                metaData = metaData.substr(0, maxW - data.caption.length - 3) + "\u2026"
+                metaData = metaData.substr(0, maxW - data.caption.length - 3) + "\u2026";
             }
             tokens.push({type: "rightAlignedText", value: metaData});
         }
@@ -10639,6 +10706,7 @@ var AcePopup = function(parentNode) {
     popup.$blockScrolling = Infinity;
     popup.isOpen = false;
     popup.isTopdown = false;
+    popup.autoSelect = true;
 
     popup.data = [];
     popup.setData = function(list) {
@@ -10654,7 +10722,7 @@ var AcePopup = function(parentNode) {
         return selectionMarker.start.row;
     };
     popup.setRow = function(line) {
-        line = Math.max(0, Math.min(this.data.length, line));
+        line = Math.max(this.autoSelect ? 0 : -1, Math.min(this.data.length, line));
         if (selectionMarker.start.row != line) {
             popup.selection.clearSelection();
             selectionMarker.start.row = selectionMarker.end.row = line || 0;
@@ -10683,12 +10751,15 @@ var AcePopup = function(parentNode) {
         var renderer = this.renderer;
         var maxH = renderer.$maxLines * lineHeight * 1.4;
         var top = pos.top + this.$borderSize;
-        if (top + maxH > screenHeight - lineHeight && !topdownOnly) {
+        var allowTopdown = top > screenHeight / 2 && !topdownOnly;
+        if (allowTopdown && top + lineHeight + maxH > screenHeight) {
+            renderer.$maxPixelHeight = top - 2 * this.$borderSize;
             el.style.top = "";
             el.style.bottom = screenHeight - top + "px";
             popup.isTopdown = false;
         } else {
             top += lineHeight;
+            renderer.$maxPixelHeight = screenHeight - top - 0.2 * lineHeight;
             el.style.top = top + "px";
             el.style.bottom = "";
             popup.isTopdown = true;
@@ -10878,6 +10949,8 @@ var Autocomplete = function() {
         if (!this.popup)
             this.$init();
 
+	this.popup.autoSelect = this.autoSelect;
+
         this.popup.setData(this.completions.filtered);
 
         editor.keyBinding.addKeyboardHandler(this.keyboardHandler);
@@ -10937,7 +11010,7 @@ var Autocomplete = function() {
     this.blurListener = function(e) {
         var el = document.activeElement;
         var text = this.editor.textInput.getElement();
-        var fromTooltip = e.relatedTarget && e.relatedTarget == this.tooltipNode;
+        var fromTooltip = e.relatedTarget && this.tooltipNode && this.tooltipNode.contains(e.relatedTarget);
         var container = this.popup && this.popup.container;
         if (el != text && el.parentNode != container && !fromTooltip
             && el != this.tooltipNode && e.relatedTarget != text
@@ -11018,7 +11091,6 @@ var Autocomplete = function() {
         var session = editor.getSession();
         var pos = editor.getCursorPosition();
 
-        var line = session.getLine(pos.row);
         var prefix = util.getCompletionPrefix(editor);
 
         this.base = session.doc.createAnchor(pos.row, pos.column - prefix.length);
@@ -11030,10 +11102,8 @@ var Autocomplete = function() {
             completer.getCompletions(editor, session, pos, prefix, function(err, results) {
                 if (!err && results)
                     matches = matches.concat(results);
-                var pos = editor.getCursorPosition();
-                var line = session.getLine(pos.row);
                 callback(null, {
-                    prefix: prefix,
+                    prefix: util.getCompletionPrefix(editor),
                     matches: matches,
                     finished: (--total === 0)
                 });
@@ -11146,6 +11216,7 @@ var Autocomplete = function() {
             this.tooltipNode.style.pointerEvents = "auto";
             this.tooltipNode.tabIndex = -1;
             this.tooltipNode.onblur = this.blurListener.bind(this);
+            this.tooltipNode.onclick = this.onTooltipClick.bind(this);
         }
 
         var tooltipNode = this.tooltipNode;
@@ -11181,6 +11252,18 @@ var Autocomplete = function() {
         this.tooltipNode = null;
         if (el.parentNode)
             el.parentNode.removeChild(el);
+    };
+    
+    this.onTooltipClick = function(e) {
+        var a = e.target;
+        while (a && a != this.tooltipNode) {
+            if (a.nodeName == "A" && a.href) {
+                a.rel = "noreferrer";
+                a.target = "_blank";
+                break;
+            }
+            a = a.parentNode;
+        }
     };
 
 }).call(Autocomplete.prototype);
@@ -11810,11 +11893,11 @@ exports.commands = [{
         exports.beautify(editor.session);
     },
     bindKey: "Ctrl-Shift-B"
-}]
+}];
 
 });
 
-define("kitchen-sink/demo",["require","exports","module","ace/lib/fixoldbrowsers","ace/multi_select","ace/ext/spellcheck","kitchen-sink/inline_editor","kitchen-sink/dev_util","kitchen-sink/file_drop","ace/config","ace/lib/dom","ace/lib/net","ace/lib/lang","ace/lib/useragent","ace/lib/event","ace/theme/textmate","ace/edit_session","ace/undomanager","ace/keyboard/hash_handler","ace/virtual_renderer","ace/editor","ace/ext/whitespace","kitchen-sink/doclist","ace/ext/modelist","ace/ext/themelist","kitchen-sink/layout","kitchen-sink/token_tooltip","kitchen-sink/util","ace/ext/elastic_tabstops_lite","ace/incremental_search","ace/worker/worker_client","ace/split","ace/keyboard/vim","ace/ext/statusbar","ace/ext/emmet","ace/snippets","ace/ext/language_tools","ace/ext/beautify"], function(require, exports, module) {
+define("kitchen-sink/demo",["require","exports","module","ace/lib/fixoldbrowsers","ace/multi_select","ace/ext/spellcheck","kitchen-sink/inline_editor","kitchen-sink/dev_util","kitchen-sink/file_drop","ace/config","ace/lib/dom","ace/lib/net","ace/lib/lang","ace/lib/useragent","ace/lib/event","ace/theme/textmate","ace/edit_session","ace/undomanager","ace/keyboard/hash_handler","ace/virtual_renderer","ace/editor","ace/ext/whitespace","kitchen-sink/doclist","ace/ext/modelist","ace/ext/themelist","kitchen-sink/layout","kitchen-sink/token_tooltip","kitchen-sink/util","ace/ext/elastic_tabstops_lite","ace/incremental_search","ace/worker/worker_client","ace/split","ace/keyboard/vim","ace/ext/statusbar","ace/ext/emmet","ace/snippets","ace/ext/language_tools","ace/ext/beautify","ace/keyboard/keybinding","ace/commands/command_manager"], function(require, exports, module) {
 "use strict";
 
 require("ace/lib/fixoldbrowsers");
@@ -12069,6 +12152,7 @@ var showHScrollEl = document.getElementById("show_hscroll");
 var showVScrollEl = document.getElementById("show_vscroll");
 var animateScrollEl = document.getElementById("animate_scroll");
 var softTabEl = document.getElementById("soft_tab");
+var navigateWithinSoftTabEl = document.getElementById("navigate_within_soft_tab");
 var behavioursEl = document.getElementById("enable_behaviours");
 
 fillDropdown(docEl, doclist.all);
@@ -12138,6 +12222,7 @@ function updateUIEditorOptions() {
     saveOption(showHScrollEl, editor.renderer.getHScrollBarAlwaysVisible());
     saveOption(animateScrollEl, editor.getAnimatedScroll());
     saveOption(softTabEl, session.getUseSoftTabs());
+    saveOption(navigateWithinSoftTabEl, session.getNavigateWithinSoftTabs());
     saveOption(behavioursEl, editor.getBehavioursEnabled());
 }
 
@@ -12230,6 +12315,10 @@ bindCheckbox("animate_scroll", function(checked) {
 
 bindCheckbox("soft_tab", function(checked) {
     env.editor.session.setUseSoftTabs(checked);
+});
+
+bindCheckbox("navigate_within_soft_tab", function(checked) {
+    env.editor.session.setNavigateWithinSoftTabs(checked);
 });
 
 bindCheckbox("enable_behaviours", function(checked) {
@@ -12348,5 +12437,51 @@ env.editor.setOptions({
 
 var beautify = require("ace/ext/beautify");
 env.editor.commands.addCommands(beautify.commands);
+
+var KeyBinding = require("ace/keyboard/keybinding").KeyBinding;
+var CommandManager = require("ace/commands/command_manager").CommandManager;
+var commandManager = new CommandManager();
+var kb = new KeyBinding({
+    commands: commandManager,
+    fake: true
+});
+event.addCommandKeyListener(document.documentElement, kb.onCommandKey.bind(kb));
+event.addListener(document.documentElement, "keyup", function(e) {
+    if (e.keyCode === 18) // do not trigger browser menu on windows
+        e.preventDefault();
+});
+commandManager.addCommands([{
+    name: "window-left",
+    bindKey: {win: "cmd-alt-left", mac: "ctrl-cmd-left"},
+    exec: function() {
+        moveFocus("left");
+    }
+}, {
+    name: "window-right",
+    bindKey: {win: "cmd-alt-right", mac: "ctrl-cmd-right"},
+    exec: function() {
+        moveFocus("right");
+    }
+}, {
+    name: "window-up",
+    bindKey: {win: "cmd-alt-up", mac: "ctrl-cmd-up"},
+    exec: function() {
+        moveFocus("up");
+    }
+}, {
+    name: "window-down",
+    bindKey: {win: "cmd-alt-down", mac: "ctrl-cmd-down"},
+    exec: function() {
+        moveFocus("down");
+    }
+}]);
+
+function moveFocus() {
+    var el = document.activeElement;
+    if (el == env.editor.textInput.getElement())
+        env.editor.cmdLine.focus();    
+    else
+        env.editor.focus();
+}
 
 });
