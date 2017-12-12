@@ -1585,7 +1585,7 @@ if(session.getState(pos.row) == "comment1"){
                     finished: (--total === 0)
                 });
             });
-        }
+        });
         return true;
     };
 
