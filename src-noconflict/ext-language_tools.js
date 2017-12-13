@@ -1547,9 +1547,35 @@ var Autocomplete = function() {
     this.gatherCompletions = function(editor, callback) {
         var session = editor.getSession();
         var pos = editor.getCursorPosition();
+        var selectionStart = editor.selection.getSelectionAnchor();
+        var selectionEnd = editor.selection.getSelectionLead();
+        if (selectionStart.row === selectionEnd.row && selectionStart.column === selectionEnd.column) {
+        	var wordRange = editor.selection.getWordRange();
+        	var line = editor.session.getLine(wordRange.start.row);
+            var word = line.substring(wordRange.start.column,wordRange.end.column );
+            var hasAlpha = false;
+            editor.completers.forEach(function(completer) {
+                if (completer.alphaRegexps) {
+                    completer.alphaRegexps.forEach(function(alphaRegexp) {
+                    	for (var i=0; i< word.length; i++) {
+                    		if (alphaRegexp.test(word[i])) {
+                    			hasAlpha = true;
+                    			break;
+                    		}
+                    	}
+                    }.bind(this));
+                }
+            }.bind(this));
 
+            if (hasAlpha) {
+            	this.base = session.doc.createAnchor(pos.row, pos.column);
+        		editor.selection.selectWord();
+        	}
+        }
+
+        var line = editor.session.getLine(pos.row);
         var prefix = util.getCompletionPrefix(editor);
-
+        
         this.base = session.doc.createAnchor(pos.row, pos.column - prefix.length);
         this.base.$insertRight = true;
 
