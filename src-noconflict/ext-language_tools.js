@@ -1872,6 +1872,8 @@ var FilteredList = function(array, filterText) {
 
         this.filterText = str;
         matches = this.filterCompletions(matches, this.filterText);
+        //T3363 disable ACE sorting penalty
+        /*
         matches = matches.sort(function(a, b) {
             if (a.score==b.score){
                 a.name.localeCompare(b.name)
@@ -1879,6 +1881,7 @@ var FilteredList = function(array, filterText) {
                 return b.score-a.score
             };
         });
+		*/
         // Dont use score for sorting
         // Confusing for the users
         //  b.exactMatch - a.exactMatch || b.score - a.score
@@ -1949,7 +1952,8 @@ var FilteredList = function(array, filterText) {
             }
             item.matchMask = matchMask;
             item.exactMatch = penalty ? 0 : 1;
-            item.score = (item.score || 0) - penalty;
+            //T3363 disable ACE sorting penalty
+            item.score = (item.score || 0) /*- penalty*/;
             results.push(item);
         }
         return results;
