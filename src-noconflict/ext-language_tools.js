@@ -1474,8 +1474,14 @@ var Autocomplete = function() {
             if (this.completions.filterText) {
                 var ranges = this.editor.selection.getAllRanges();
                 for (var i = 0, range; range = ranges[i]; i++) {
-                    range.start.column -= this.completions.filterText.length;
-                    this.editor.session.remove(range);
+                    var line = this.editor.session.getLine(range.start.row);
+                    var word = line.substring(range.start.column, range.end.column);
+                    if (this.completions.filterText.indexOf(word) === -1) {
+                    	range.start.column -= this.completions.filterText.length;
+                    } else {
+                    	range.start.column = line.indexOf(this.completions.filterText);
+                    }
+                	this.editor.session.remove(range);
                 }
             }
             if (data.snippet)
@@ -1551,6 +1557,11 @@ var Autocomplete = function() {
         var selectionEnd = editor.selection.getSelectionLead();
         if (selectionStart.row === selectionEnd.row && selectionStart.column === selectionEnd.column) {
         	var wordRange = editor.selection.getWordRange();
+            editor.completers.forEach(function(completer, i) {
+            	if (completer.getWordRange) {
+            		wordRange = completer.getWordRange(editor, pos);
+            	}
+            });
         	var line = editor.session.getLine(wordRange.start.row);
             var word = line.substring(wordRange.start.column,wordRange.end.column );
             var hasAlpha = false;
@@ -1569,10 +1580,11 @@ var Autocomplete = function() {
 
             if (hasAlpha) {
             	this.base = session.doc.createAnchor(pos.row, pos.column);
-        		editor.selection.selectWord();
+        		editor.selection.setSelectionRange(wordRange);
         	}
         }
-
+        
+        var pos = editor.getCursorPosition();
         var line = editor.session.getLine(pos.row);
         var prefix = util.getCompletionPrefix(editor);
         
